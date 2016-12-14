@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#
+# Jean-Philippe Bouchard (jean-philippe.bouchard@vantrix.com)'s
+# bootstrapped environment.
+#
+
+prefix="/tmp/.tesla"
+screenrc="$prefix-screenrc"
+bashrc="$prefix-bashrc"
+bash="$prefix-bash"
+screen_session="tesla"
+
+cat > $screenrc <<'EOS'
+caption always "%w"
+vbell off
+EOS
+
+cat > $bashrc <<'EOS'
+if [ -f .bashrc ]
+then
+	. .bashrc
+fi
+# RHEL stock + date/time
+PS1="[\\D{%m/%d %H:%M:%S}] [\\h \\W]\\$ "
+# history with date
+HISTTIMEFORMAT='%F %T '
+# history size
+HISTFILESIZE=10000
+HISTSIZE=10000
+# history append
+shopt -s histappend
+PROMPT_COMMAND="history -a;"
+# To prevent echoing of ^C
+stty -ctlecho
+export EDITOR=vim
+export SHELL=/bin/bash
+EOS
+
+cat > $bash <<EOS
+#!/bin/bash
+exec bash --rcfile $bashrc
+EOS
+chmod 755 $bash
+
+if [ -x /usr/bin/screen ]
+then
+	exec screen -t screen -h 100000 -c $screenrc -s $bash -Rd $screen_session
+else
+	echo "screen not installed..."
+	exec $bash
+fi

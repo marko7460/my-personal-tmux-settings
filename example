@@ -1,0 +1,15 @@
+# Put this in ~/.tmux/ folder
+attach-session -t my-jenkins
+
+set -g set-remain-on-exit on
+
+new-window -d -n "local"
+new-window -d -n "local"
+new-window -d -n "master" "sshbs mvlahovic@build1.my-jenkins.com"
+new-window -d -n "build2" "sshbs mvlahovic@build2.my-jenkins.com"
+new-window -d -n "build3" "sshbs mvlahovic@build3.my-jenkins.com"
+new-window -d -n "build4" "sshbs mvlahovic@build4.my-jenkins.com"
+new-window -d -n "build5" "sshbs mvlahovic@build5.my-jenkins.com"
+set -g set-remain-on-exit off
+
+

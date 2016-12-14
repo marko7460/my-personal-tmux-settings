@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#
+# ssh wrapper that sets up the remote environment using bs.
+#
+
+host="$1"
+ssh_options=${ssh_options:-""}
+scp_options=${scp_options:-""}
+ssh_password=${ssh_password:-""}
+if [ -z "$host" ]
+then
+        echo "usage: $0 HOST" 1>&2
+        exit 1
+fi
+
+sshpass=""
+if [ -x /usr/local/bin/sshpass -a -n "$ssh_password" ]
+then
+        sshpass="sshpass -p $ssh_password"
+fi
+
+target=$(echo $host | sed -E 's/^.+@//')
+for i in $(seq 1 2)
+do
+        echo "Trying to connect to $target..."
+        nc -w 1 $target 22 >/dev/null 2>&1 && break
+        sleep 5
+done
+$sshpass scp $scp_options -q ~/bin/bs $host:/tmp/.tesla-bs && exec $sshpass ssh  $ssh_options $host -t /tmp/.tesla-bs
+echo
+echo "#####################################"
+echo "Unable to setup bootstrap environment" 1>&2
+echo "#####################################"
+echo
+ssh $ssh_options $host

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#
+# tmux wrapper used to bootstrapper sessions stored
+# in ~/.tmux/
+#
+
+executable="/usr/local/bin/tmux"
+
+if [ $# -eq 1 -a -f ~/.tmux/$1  ]
+then
+        name=$1
+        echo -ne "\033]0;"$name"\007"
+        $executable has-session -t $name >/dev/null 2>&1
+        rv=$?
+        if [ $rv -eq 0 ]
+        then
+                exec tmux attach-session -d -t $name
+        else
+                exec tmux new-session -s $name \; source ~/.tmux/$name
+        fi
+else
+        exec $executable $@
+fi

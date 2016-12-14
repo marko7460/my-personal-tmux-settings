@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#
+# Run a command in a new bash shell, appending it to the history first.
+# This way, the command can be rerun easily.
+#
+
+cmd="$1"
+
+if [ -z "$cmd" ]
+then
+        echo "usage: $0 CMD" 1>&2
+        exit 1
+fi
+
+echo "history -s \"$cmd\";$cmd" > /tmp/.$$
+exec bash --rcfile /tmp/.$$
